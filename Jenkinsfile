@@ -1,20 +1,27 @@
 pipeline {
     agent any
-
+     environment {
+        DOCKER_IMAGE = 'jenkins-docker-net'
+        DOCKER_TAG = 'latest' 
+    }
     stages {
-        stage('Hello1') {
+        stage('Checkout') {
             steps {
-                echo 'Hello World'
+                checkout scm
             }
         }
-        stage('Hello2') {
+        stage('Build Docker Image') {
             steps {
-                echo 'Hello World'
+                 script {
+                    sh "docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} ."
+                }
             }
         }
-        stage('Hello3') {
+        stage('Run Docker Container') {
             steps {
-                echo 'Hello World'
+                 script {
+                    sh "docker run -d -p 80801:8080 --name ${DOCKER_IMAGE} ${DOCKER_IMAGE}:${DOCKER_TAG}"
+                }
             }
         }
     }
